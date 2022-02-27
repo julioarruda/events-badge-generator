@@ -1,46 +1,52 @@
-name: Create Conference
-description: Create a Conference
+name: Cadastrar Evento
+description: Cadastre o Evento
 title: "[Conference]: "
 body:
   - type: input
-    id: conference
+    id: evento
     attributes:
-      label: Conference Name;
-      description: Put the Conference Name
+      label: Nome do Evento;
+      description: Nome do evento que será realizado
       placeholder: ex. GitHub Zero to Hero
     validations:
       required: true
   - type: input
     id: data
     attributes:
-      label: Date of the Conferente;
-      description: Date of the conference will be run
-      placeholder: ex. 12/01/2022
+      label: Data do Evento;
+      description: Data do evento que será realizado
+      placeholder: ex. 01/12/2022
     validations:
       required: true
   - type: textarea
     id: image
     attributes:
       label: Badge;
-      description: Upload the Full Size Badge of the conference
+      description: Faça o Upload da Badge do Evento
       placeholder: Badge
   - type: textarea
     id: image600
     attributes:
       label: Badge 600x600;
-      description: Upload the Badge on 600x600 to Social Network preview 
+      description: Faça o Upload da Badge 600x600 do Evento
       placeholder: Badge600x600   
   - type: textarea
     id: description
     attributes:
-      label: Describe the Conference;
-      description: Make a little description about the Conference
-      placeholder: Description
+      label: Descreva o Evento;
+      description: Faça uma Descrição do Evento
+      placeholder: Descrição
   - type: textarea
     id: skills
     attributes:
-      label: Skills Learned;
-      description: Describe the Skills learned in this conference
-      placeholder: "- Skill one
-                    - Skill Two"
+      label: Habilidades Aprendidas;
+      description: Descreva as Habilidades Aprendidas no Evento
+      placeholder: "<ul>
+                      <li>Sabe oque é o GitHub</li>
+                      <li>Como criar uma conta no GitHub</li>
+                      <li>Oque é CI e CD</li>
+                      <li>Quanto Custa usar o GitHub</li>
+                      <li>organizações no GitHub</li>
+                      <li>Implantação de Aplicações com GitHub Actions</li>
+                     </ul>"
    
