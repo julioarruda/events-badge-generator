@@ -1,4 +1,5 @@
-### Events Badge Generator
+# Events Badge Generator
+![Sample](images/sample.png)
 
 This project was born from creating badges for free training or conferences at a low cost.
 My main idea was to create automated certificates based on a participants list and share a badge online to validate the authenticity of this one.
@@ -37,7 +38,7 @@ Now, you need to check the Actions Secrets, because some secrets are necessary t
 - MAIL_USERNAME
 - MAIL_PASSWORD
 
-# The SSH secrets need to have permission to commit in your GitHub repositories. (it's necessary because I created this process using two different repositories in the first moment, and now, I need to refactor the actions).
+### The SSH secrets need to have permission to commit in your GitHub repositories. (it's necessary because I created this process using two different repositories in the first moment, and now, I need to refactor the actions).
 
 ## Creating a New Conference
 
