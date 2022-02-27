@@ -76,7 +76,7 @@ jobs:
       - name: Creating a Participant Page
         run: |  
           cd ${{ steps.repository.outputs.rootdirectory }}/events/${{ steps.participants.outputs.participantevent }}        
-          urlbadge="https://creds.arruda.io/events/${{ steps.event.outputs.eventnametrimmed }}/badge.png"
+          urlbadge="https://julioarruda.github.io/events-badge-generator/events/${{ steps.event.outputs.eventnametrimmed }}/badge.png"
           #creation of html template
 
           skills="$(cat skills.txt)"
