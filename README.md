@@ -9,8 +9,8 @@ The core of this project is GitHub because I'm using GitHub to host my source co
 This project is separated into two main parts:
 - Certificate Creation
 - Event and Badge Creation
-- The first one is based on this content from my friend, the MVP Gustavo de Moraes: (Live Solidária - Gerando seus certificados com Power Automate
-)[https://www.youtube.com/watch?v=WYgRjHcgloQ]
+- The first one is based on this content from my friend, the MVP Gustavo de Moraes: [Live Solidária - Gerando seus certificados com Power Automate
+](https://www.youtube.com/watch?v=WYgRjHcgloQ)
 
 
 ## Certificate Creation
