@@ -12,7 +12,7 @@ jobs:
   
   build:
     runs-on: ubuntu-latest
-    if: contains(github.event.issue.title, '[Evento]:')
+    if: contains(github.event.issue.title, '[Conference]:')
     steps:
       - uses: actions/checkout@v2
 
