@@ -1,0 +1,138 @@
+
+name: Create Badge Page
+
+on:
+  issues:
+    types: [opened]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.title, '[Certificate]')
+    
+    steps:
+      
+      - uses: actions/checkout@v2
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          name: id_rsa # optional
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+      - name: Read Participants Information
+        id: participants
+        run: |
+         echo "${{ github.event.issue.body }}" > temp.txt
+         participantName="$(cat temp.txt | grep "participant" | cut -d":" -f2)"
+         participantid="$(cat temp.txt | grep "id" | cut -d":" -f2)"
+         participantevent="$(cat temp.txt | grep "event" | cut -d":" -f2)"
+         participantemail="$(cat temp.txt | grep "email" | cut -d":" -f2)"
+         participantcertificate="$(cat temp.txt | grep "certificate" | cut -d"]" -f2 | grep -Eo 'https://[^ >]+' |head -1  | rev | cut -c1- | rev)"
+         
+          echo "::set-output name=participantName::$participantName"
+          echo "::set-output name=participantid::$participantid"
+          echo "::set-output name=participantevent::$participantevent"
+          echo "::set-output name=participantcertificate::$participantcertificate"
+          echo "::set-output name=participantemail::$participantemail"
+          
+
+
+      - name: Cloning GitHub Repository
+        id: repository
+        run: |
+          git config --global user.name 'Julio Arruda'
+          git config --global user.email 'julio.arruda@outlook.com'
+          git clone git@github.com:julioarruda/poc.git
+
+          cd poc
+          localpath=$(pwd)
+          echo "::set-output name=rootdirectory::$localpath"
+          
+
+      - name: Get Event Information
+        id: event
+        run: |
+          
+          
+          cd ${{ steps.repository.outputs.rootdirectory }}/events/${{ steps.participants.outputs.participantevent }}
+          
+          eventname="$(cat config.txt | grep "eventname" | cut -d":" -f2)"
+          eventnametrimmed="$(cat config.txt | grep "eventtrimmed" | cut -d":" -f2)"
+          eventdate="$(cat config.txt | grep "eventdate" | cut -d":" -f2)"
+          eventdescription="$(cat config.txt | grep "eventdescription" | cut -d":" -f2)"
+          skills="$(cat skills.txt)"
+
+          echo "::set-output name=eventname::$eventname"
+          echo "::set-output name=eventnametrimmed::$eventnametrimmed"
+          echo "::set-output name=eventdate::$eventdate"
+          echo "::set-output name=eventdescription::$eventdescription"
+          echo "::set-output name=eventskills::$skills"
+
+          
+
+      - name: Creating a Participant Page
+        run: |  
+          cd ${{ steps.repository.outputs.rootdirectory }}/events/${{ steps.participants.outputs.participantevent }}        
+          urlbadge="https://creds.arruda.io/events/${{ steps.event.outputs.eventnametrimmed }}/badge.png"
+          #creation of html template
+
+          skills="$(cat skills.txt)"
+
+
+          echo "<body>" >> ${{ steps.participants.outputs.participantid }}.md
+          echo "<main id="root">" >> ${{ steps.participants.outputs.participantid }}.md
+          echo "<div><div><div>" >> ${{ steps.participants.outputs.participantid }}.md
+          echo "<p><img src=" >> ${{ steps.participants.outputs.participantid }}.md
+          echo '"' >> ${{ steps.participants.outputs.participantid }}.md
+          echo "$urlbadge" >> ${{ steps.participants.outputs.participantid }}.md
+          echo '"' >> ${{ steps.participants.outputs.participantid }}.md
+          echo " /></p>" >> ${{ steps.participants.outputs.participantid }}.md
+          echo "</div></div></div>" >> ${{ steps.participants.outputs.participantid }}.md
+
+          echo "<div><div><div><div><div><div>" >> ${{ steps.participants.outputs.participantid }}.md
+          echo "<h1>${{ steps.event.outputs.eventname }}</h1>" >> ${{ steps.participants.outputs.participantid }}.md
+          echo '<div><div>Issued by: Event Issuer</div><div>&nbsp;</div>' >> ${{ steps.participants.outputs.participantid }}.md
+          echo "<div>This certificate was issued to: <strong>${{ steps.participants.outputs.participantName }}</strong>, on ${{ steps.event.outputs.eventdate }}.</div>" >> ${{ steps.participants.outputs.participantid }}.md
+          echo "</div></div>" >> ${{ steps.participants.outputs.participantid }}.md
+
+          echo "<p>${{ steps.event.outputs.eventdescription }}</p>" >> ${{ steps.participants.outputs.participantid }}.md
+
+          echo "</div><div>" >> ${{ steps.participants.outputs.participantid }}.md
+          
+          echo "<h1>Skills</h1>" >> ${{ steps.participants.outputs.participantid }}.md
+          echo "<ul>$skills</ul>" >> ${{ steps.participants.outputs.participantid }}.md
+
+          echo "</div><div>&nbsp;</div></div></div></div></div></main></body>" >> ${{ steps.participants.outputs.participantid }}.md
+
+
+
+          git add .
+          git commit -m "including badges to participant ${{ steps.participants.outputs.participantName }}"
+          git push
+
+      - name: Send mail
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{secrets.MAIL_USERNAME}}
+          password: ${{secrets.MAIL_PASSWORD}}
+          subject: "Thanks for participate of the conference - ${{ steps.event.outputs.eventname }}"
+          to: ${{ steps.participants.outputs.participantemail }}
+          from: Julio Arruda
+          secure: true
+          body: |
+            "Thanks for your presence.
+            Here is your Certificate: ${{ steps.participants.outputs.participantcertificate }}
+            And your badge: https://julioarruda.github.io/events-badge-generator/events/${{ steps.event.outputs.eventnametrimmed}}/${{ steps.participants.outputs.participantid}}"
+
+      - name: Close Issue
+        uses: peter-evans/close-issue@v1
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          comment: |
+            Badge avaliable on: https://julioarruda.github.io/events-badge-generator/events/${{ steps.event.outputs.eventnametrimmed}}/${{ steps.participants.outputs.participantid}}
+            Process Finished.

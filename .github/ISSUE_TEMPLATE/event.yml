@@ -1,0 +1,46 @@
+name: Create Conference
+description: Create a Conference
+title: "[Conference]: "
+body:
+  - type: input
+    id: conference
+    attributes:
+      label: Conference Name;
+      description: Put the Conference Name
+      placeholder: ex. GitHub Zero to Hero
+    validations:
+      required: true
+  - type: input
+    id: data
+    attributes:
+      label: Date of the Conferente;
+      description: Date of the conference will be run
+      placeholder: ex. 12/01/2022
+    validations:
+      required: true
+  - type: textarea
+    id: image
+    attributes:
+      label: Badge;
+      description: Upload the Full Size Badge of the conference
+      placeholder: Badge
+  - type: textarea
+    id: image600
+    attributes:
+      label: Badge 600x600;
+      description: Upload the Badge on 600x600 to Social Network preview 
+      placeholder: Badge600x600   
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the Conference;
+      description: Make a little description about the Conference
+      placeholder: Description
+  - type: textarea
+    id: skills
+    attributes:
+      label: Skills Learned;
+      description: Describe the Skills learned in this conference
+      placeholder: "- Skill one
+                    - Skill Two"
+   

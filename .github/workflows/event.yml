@@ -1,0 +1,97 @@
+name: Create Event
+
+
+on:
+  issues:
+    types: [opened]
+  
+
+  workflow_dispatch:
+
+jobs:
+  
+  build:
+    runs-on: ubuntu-latest
+    if: contains(github.event.issue.title, '[Evento]:')
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          name: id_rsa # optional
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+
+
+      - name: Getting issue information
+        id: issue
+        run: |
+          echo "${{ github.event.issue.body }}" > temp.txt
+          eventname=$(cat temp.txt | sed '3!d')
+          eventtrimmedname=$(cat temp.txt | sed '3!d' | sed 's/ /_/g' | sed -e 's/\(.*\)/\L\1/' | sed 'y/áÁàÀãÃâÂéÉêÊíÍóÓõÕôÔúÚçÇ/aAaAaAaAeEeEiIoOoOoOuUcC/')
+          eventdate=$(cat temp.txt | sed '7!d')
+          eventbadge=$(cat temp.txt | sed '11!d' | grep -Eo 'https://[^ >]+' |head -1  | rev | cut -c3- | rev)
+          eventbadge600=$(cat temp.txt | sed '16!d' | grep -Eo 'https://[^ >]+' |head -1  | rev | cut -c3- | rev)
+          eventdescription=$(cat temp.txt | sed '21!d')
+          
+
+          echo "::set-output name=eventname::$eventname"
+          echo "::set-output name=eventtrimmedname::$eventtrimmedname"
+          echo "::set-output name=eventdate::$eventdate"
+          echo "::set-output name=eventbadge::$eventbadge"
+          echo "::set-output name=eventbadge600::$eventbadge600"
+          echo "::set-output name=eventdescription::$eventdescription"
+          
+
+      - name: Cloning GitHub Repository
+        id: repository
+        run: |
+          rm -rf poc
+          git config --global user.name 'Julio Arruda'
+          git config --global user.email 'julio.arruda@outlook.com'
+          git clone git@github.com:julioarruda/poc.git
+
+          cd poc/events/
+          localpath=$(pwd)
+          echo "::set-output name=rootdirectory::$localpath"
+
+      - name: Adding event details
+        run: |
+          echo "Event Name: ${{ steps.issue.outputs.eventname }}"
+          cd ${{ steps.repository.outputs.rootdirectory }}
+          
+          #Getting Skills list
+          echo "${{ github.event.issue.body }}" > temp.txt
+          eventdesskills=$(cat temp.txt | sed -n 'H; /Habilidades /h; ${g;p;}' | grep -v 'Habilidades')
+          rm temp.txt
+
+          mkdir Event Name: ${{ steps.issue.outputs.eventtrimmedname }}
+          cd ${{ steps.issue.outputs.eventtrimmedname }}
+          curl ${{ steps.issue.outputs.eventbadge }} -o badge.png
+          curl ${{ steps.issue.outputs.eventbadge600 }} -o badge-600x600.png
+
+          echo "eventname:${{ steps.issue.outputs.eventname }}" >> config.txt
+          echo "eventtrimmed:${{ steps.issue.outputs.eventtrimmedname }}" >> config.txt
+          echo "eventdate:${{ steps.issue.outputs.eventdate }}" >> config.txt
+          echo "eventdescription:${{ steps.issue.outputs.eventdescription }}" >> config.txt
+
+          echo "$eventdesskills" > lines.txt
+          while IFS= read -r line; do   printf '<li>%s</li>\n' "$line"; done < lines.txt > skills.txt
+          rm lines.txt
+          
+          git add .
+          git commit -m "including badges from event"
+          git push
+
+      - name: Close Issue
+        uses: peter-evans/close-issue@v1
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          comment: |
+            Evento ${{ steps.issue.outputs.eventname }} Criado.
+          
+         
+          
+
+
