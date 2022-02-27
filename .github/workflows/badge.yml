@@ -45,9 +45,9 @@ jobs:
         run: |
           git config --global user.name 'Julio Arruda'
           git config --global user.email 'julio.arruda@outlook.com'
-          git clone git@github.com:julioarruda/poc.git
+          git clone git@github.com:julioarruda/events-badge-generator.git
 
-          cd poc
+          cd events-badge-generator
           localpath=$(pwd)
           echo "::set-output name=rootdirectory::$localpath"
           
